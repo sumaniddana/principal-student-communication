@@ -1,120 +1,491 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Principal Registration and Dashboard</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        h2, h3 { color: #2c3e50; }
-        .section { margin-top: 20px; }
-        .hidden { display: none; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ccc; padding: 10px; text-align: left; }
-        th { background-color: #f4f4f4; }
-        button { padding: 5px 10px; background-color: #3498db; color: white; border: none; cursor: pointer; }
-        button:hover { background-color: #2980b9; }
-    </style>
+<title>Principal Dashboard</title>
+
+<style>
+body{
+    font-family:Arial;
+    margin:20px;
+    background:#f4f6f8;
+    color:#2c3e50;
+}
+
+.section{
+    background:white;
+    padding:20px;
+    margin-bottom:20px;
+    border-radius:10px;
+    box-shadow:0 4px 10px #ddd;
+}
+
+input,button,select,textarea{
+    width:100%;
+    padding:10px;
+    margin:6px 0;
+    border-radius:6px;
+    border:1px solid #ccc;
+}
+
+button{
+    background:#3498db;
+    color:white;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#2980b9;
+}
+
+.hidden{
+    display:none;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+}
+
+th{
+    background:#3498db;
+    color:white;
+}
+
+td,th{
+    padding:10px;
+    border:1px solid #ddd;
+}
+</style>
+
 </head>
+
 <body>
-     <h2></h2>
-    <div class="section" id="registerSection">
-        <label>Username: <input type="text" id="regUsername"></label><br><br>
-        <label>Email: <input type="email" id="regEmail"></label><br><br>
-        <label>Password: <input type="password" id="regPassword"></label><br><br>
-        <button onclick="registerPrincipal()">Register</button>
-        <p id="registerMessage" style="color:green;"></p>
-    </div>
 
-    <h2></h2>
-    <div class="section" id="loginSection">
-        <label>Username: <input type="text" id="loginUsername"></label><br><br>
-        <label>Password: <input type="password" id="loginPassword"></label><br><br>
-        <button onclick="loginPrincipal()">Login</button>
-        <p id="loginError" style="color:red;"></p>
-    </div>
 
-    <div class="dashboard hidden">
-        <h3>Registered Students</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Roll Number</th>
-                    <th>Registered At</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="studentTable"></tbody>
-        </table>
-    </div>
+<h2>Principal Register</h2>
 
-    <script>
-        function registerPrincipal() {
-            const username = document.getElementById("regUsername").value;
-            const email = document.getElementById("regEmail").value;
-            const password = document.getElementById("regPassword").value;
+<div class="section" id="register">
 
-            fetch("/register_principal", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `username=${username}&email=${email}&password=${password}`
-            })
-            .then(res => res.json())
-            .then(data => {
-                document.getElementById("registerMessage").innerText = data.message || data.error;
-            });
-        }
+<input id="regUsername" placeholder="Username">
+<input id="regEmail" placeholder="Email">
+<input id="regPassword" placeholder="Password">
 
-        function loginPrincipal() {
-            const username = document.getElementById("loginUsername").value;
-            const password = document.getElementById("loginPassword").value;
+<button onclick="registerPrincipal()">Register</button>
 
-            fetch("/login_principal", {
-                method: "POST",
-                headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                body: `username=${username}&password=${password}`
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById("loginSection").classList.add("hidden");
-                    document.getElementById("registerSection").classList.add("hidden");
-                    document.querySelector(".dashboard").classList.remove("hidden");
-                    loadStudents();
-                } else {
-                    document.getElementById("loginError").innerText = data.error;
-                }
-            });
-        }
+<p id="regMsg"></p>
 
-        function loadStudents() {
-            fetch("/students")
-                .then(response => response.json())
-                .then(data => {
-                    const table = document.getElementById("studentTable");
-                    table.innerHTML = "";
-                    data.forEach(student => {
-                        const row = document.createElement("tr");
-                        row.innerHTML = `
-                            <td>${student.name}</td>
-                            <td>${student.roll}</td>
-                            <td>${student.registered_at}</td>
-                            <td><button onclick="deleteStudent('${student.roll}')">Delete</button></td>
-                        `;
-                        table.appendChild(row);
-                    });
-                });
-        }
+</div>
 
-        function deleteStudent(roll) {
-            fetch(`/delete/${roll}`, {
-                method: "DELETE"
-            })
-            .then(response => response.json())
-            .then(result => {
-                alert(result.message || result.error);
-                loadStudents();
-            });
-        }
-    </script>
+
+
+<h2>Principal Login</h2>
+
+<div class="section" id="login">
+
+<input id="loginUsername" placeholder="Username">
+<input id="loginPassword" placeholder="Password">
+
+<button onclick="loginPrincipal()">Login</button>
+
+<p id="loginMsg"></p>
+
+</div>
+
+
+
+<div id="dashboard" class="hidden">
+
+
+<div class="section">
+
+<h2>Registered Students</h2>
+
+<table>
+
+<thead>
+<tr>
+<th>Name</th>
+<th>Roll</th>
+<th>Year</th>
+<th>Branch</th>
+<th>Date</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody id="studentTable"></tbody>
+
+</table>
+
+</div>
+
+
+
+
+<div class="section">
+
+<h2>Leave Requests</h2>
+
+<div id="leaveTable"></div>
+
+</div>
+
+
+
+
+<div class="section">
+
+<h2>Event Requests</h2>
+
+<div id="eventTable"></div>
+
+</div>
+
+
+
+
+<div class="section">
+
+<h2>Emergency Requests</h2>
+
+<div id="emergencyTable"></div>
+
+</div>
+
+
+</div>
+
+
+
+<script>
+
+
+const BASE_URL="http://127.0.0.1:8000";
+
+
+let username="";
+let password="";
+
+
+
+function registerPrincipal(){
+
+
+fetch(BASE_URL+"/register_principal",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/x-www-form-urlencoded"
+},
+
+body:
+`username=${regUsername.value}&email=${regEmail.value}&password=${regPassword.value}`
+
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+regMsg.innerText=data.message || data.error;
+
+});
+
+
+}
+
+
+
+
+function loginPrincipal(){
+
+
+username=loginUsername.value;
+password=loginPassword.value;
+
+
+fetch(BASE_URL+"/login_principal",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/x-www-form-urlencoded"
+},
+
+body:
+`username=${username}&password=${password}`
+
+})
+
+
+.then(r=>r.json())
+
+
+.then(data=>{
+
+
+if(data.success){
+
+
+register.style.display="none";
+login.style.display="none";
+
+dashboard.classList.remove("hidden");
+
+
+loadStudents();
+loadLeaves();
+loadEvents();
+loadEmergency();
+
+
+}
+
+else{
+
+loginMsg.innerText=data.error;
+
+}
+
+
+});
+
+
+}
+
+
+
+
+
+function loadStudents(){
+
+
+fetch(BASE_URL+"/students")
+
+.then(r=>r.json())
+
+.then(data=>{
+
+
+studentTable.innerHTML="";
+
+
+data.forEach(s=>{
+
+
+studentTable.innerHTML+=`
+
+<tr>
+
+<td>${s.name}</td>
+
+<td>${s.roll}</td>
+
+<td>${s.year||""}</td>
+
+<td>${s.branch||""}</td>
+
+<td>${s.registered_at}</td>
+
+
+<td>
+
+<button onclick="deleteStudent('${s.roll}')">
+Delete
+</button>
+
+</td>
+
+</tr>
+
+`;
+
+});
+
+
+});
+
+
+}
+
+
+
+function deleteStudent(roll){
+
+
+fetch(BASE_URL+"/delete_student/"+roll,{
+
+method:"DELETE"
+
+})
+
+.then(r=>r.json())
+
+.then(data=>{
+
+alert(data.message||data.error);
+
+loadStudents();
+
+});
+
+
+}
+
+
+
+
+
+function loadLeaves(){
+
+
+fetch(BASE_URL+"/view_requests",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/x-www-form-urlencoded"
+},
+
+body:
+`role=principal&username=${username}&password=${password}`
+
+})
+
+
+.then(r=>r.json())
+
+.then(data=>{
+
+
+leaveTable.innerHTML="<table><tr><th>Name</th><th>Reason</th><th>Status</th></tr>";
+
+
+data.forEach(x=>{
+
+
+leaveTable.innerHTML+=`
+
+<tr>
+
+<td>${x.name}</td>
+
+<td>${x.reason}</td>
+
+<td>${x.status}</td>
+
+</tr>`;
+
+
+});
+
+
+leaveTable.innerHTML+="</table>";
+
+
+});
+
+
+}
+
+
+
+
+
+function loadEvents(){
+
+
+fetch(BASE_URL+
+`/get_event_requests?username=${username}&password=${password}`)
+
+
+.then(r=>r.json())
+
+.then(data=>{
+
+
+eventTable.innerHTML="<table><tr><th>Title</th><th>Status</th></tr>";
+
+
+data.forEach(e=>{
+
+
+eventTable.innerHTML+=`
+
+<tr>
+
+<td>${e.title}</td>
+
+<td>${e.status}</td>
+
+</tr>`;
+
+
+});
+
+
+eventTable.innerHTML+="</table>";
+
+
+});
+
+
+}
+
+
+
+
+
+
+function loadEmergency(){
+
+
+fetch(BASE_URL+
+`/get_emergencies?username=${username}&password=${password}`)
+
+
+.then(r=>r.json())
+
+
+.then(data=>{
+
+
+emergencyTable.innerHTML="<table><tr><th>Name</th><th>Type</th><th>Status</th></tr>";
+
+
+data.forEach(e=>{
+
+
+emergencyTable.innerHTML+=`
+
+<tr>
+
+<td>${e.name}</td>
+
+<td>${e.emergency_type}</td>
+
+<td>${e.status}</td>
+
+</tr>`;
+
+
+});
+
+
+emergencyTable.innerHTML+="</table>";
+
+
+});
+
+
+}
+
+
+
+</script>
+
+
 </body>
 </html>
